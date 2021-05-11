@@ -18,7 +18,7 @@ end
 #returns the value of the highest number in the straight, -1 otherwise
 def straightVal(hand)
 	val = cardVal(hand[0][0])
-	hand.length.each do |i|
+	hand.length.times do |i|
 		if cardVal(hand[i][0]) != val+i
 			return -1
 		end
@@ -28,28 +28,15 @@ end
 
 #returns the values of the five cards (highest value first), -1 for all otherwise
 def flushVal(hand)
-	#compare first two cards
-	if hand[0][1] == hand[1][1]
-		#compare cards 2 and 3
-		if hand[1][1] == hand [2][1]
-			#compare cards 3 and 4
-			if hand[2][1] == hand[3][1]
-				#compare cards 4 and 5
-				if hand[3][1] == hand[4][1]
-					temp = Array.new
-					5.times do |i|
-						temp.push(cardVal(hand[4-i][1]))
-					end
-					return temp
-				end
-			end
-		end	
+	vals = Array.new
+	4.downto(0) do |i|
+		if hand[i][1] == hand[0][1]
+			vals.push(cardVal(hand[i]))
+		else
+			return [-1, -1, -1, -1, -1]
+		end
 	end
-	temp = Array.new
-	5.times do |i|
-		temp.push(-1)
-	end
-	return temp
+	return vals
 end
 
 #returns the value of the house, trips and then pair. -1 for both otherwise
@@ -64,7 +51,7 @@ end
 
 #returns a triple, triple value first, then remaining cards in order of value
 def tripVal(hand)
-	3.each do |i|
+	3.times do |i|
 		if hand[i][0] == hand[i+1][0] and hand[i+1][0] == hand[i+2][0]
 			trip = cardVal(hand[i][0])
 			case
@@ -97,10 +84,10 @@ end
 #returns a quad, first value is double, last 3 are high cards, highest to lowest
 def pairVal(hand)
 	4.times do |i|
-		if cardVal(hand[i][0]) == cardVal(hand[i+1][0])
-			arr = [cardVal(hand[i][0])]
-			highcardsvals = hand.slice(i, i+1).reverse.each{|c| c = cardVal(c)}
-			arr.append(highcardsvals)
+		if cardVal(hand[i]) == cardVal(hand[i+1])
+			arr = [cardVal(hand[i])]
+			highcardsvals = hand.slice(i, i+1).reverse.map{|c| cardVal(c)}
+			arr.concat(highcardsvals)
 			return arr
 		end
 	end
@@ -149,8 +136,8 @@ def evalHand(handa, handb)
 	flushb = flushVal(handb)
 	
 	#check for straight flush
-	if straighta > 0 and flusha > 0
-		if straightb > 0 and flushb > 0
+	if straighta > 0 and flusha[0] > 0
+		if straightb > 0 and flushb[0] > 0
 			if straighta > straightb
 				return true
 			end
@@ -158,7 +145,7 @@ def evalHand(handa, handb)
 		else
 			return true
 		end
-	elsif straightb > 0 and flushb > 0
+	elsif straightb > 0 and flushb[0] > 0
 		return false
 	end
 	
@@ -190,20 +177,12 @@ def evalHand(handa, handb)
 		return true
 	end
 	#check for flush
-	if flusha[0] > 0
-		if flushb[0] > 0
-			5.times do |i|
-				if flusha[i] > flushb[i]
-					return true
-				elsif flusha[i] < flushb[i]
-					return false
-				end
-			end
+	5.times do |i|
+		if flusha[i] > flushb[i]
+			return true
+		elsif flushb[i] > flusha[i]
 			return false
 		end
-		return true
-	elsif flushb[0] > 0
-		return false
 	end
 	#check for straight
 	if straighta > 0
@@ -218,12 +197,12 @@ def evalHand(handa, handb)
 	#check for trips
 	tripa = tripVal(handa)
 	tripb = tripVal(handb)
-	if tripa[0] > 0
-		if tripb[0] > 0
-			return tripa[0] > tripb[0] or (tripa[0]==tripb[0] and tripa[1]>tripb[1]) or (tripa[0]==tripb[0] and tripa[1]==tripb[1] and tripa[2]>tripb[2])
+	3.times do |i|
+		if tripa[i] > tripb[i]
+			return true
+		elsif tripb[i] > tripa[i]
+			return false
 		end
-	elsif tripb[0] > 0
-		return false
 	end
 	#check for 2 pair
 	tpa = twoPairVal(handa)
@@ -248,7 +227,7 @@ def evalHand(handa, handb)
 	#high card
 	higha = highVal(handa)
 	highb = highVal(handb)
-	4.downto(0) do |i|
+	4.times do |i|
 		if higha[i] > highb[i]
 			return true
 		elsif highb[i] > higha[i]
@@ -257,7 +236,6 @@ def evalHand(handa, handb)
 	end
 	return false
 end
-
 
 def main
 	file = File.open("Problem_54.txt")
@@ -270,7 +248,6 @@ def main
 		if evalHand(handa, handb)
 			count += 1
 		end
-		break
 	end
 	puts "Solution: #{count}"
 end
