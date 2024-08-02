@@ -1,75 +1,63 @@
-require 'set'
-
-#find the smallest cube such that five permutations of its digits are cube
-
-#perms holds all the permutations
-#remaining holds the array without the processed elements
-#processed holds the array without the remaining elements
-def permutations(perms, digits)
-	counts = Array.new(digits.size, 0)
-	
+def num_digits(n)
+    total = 0
+    while n > 0
+        n = (n - (n % 10)) / 10
+        total += 1
+    end
+    total
 end
 
-def getNumber(arr)
-	multiplier = 1
-	num = 0
-	(0...arr.size).each do |i|
-		num += arr[arr.size-1-i]*multiplier
-		multiplier *= 10
+
+def isPermutation?(a, b)
+	digit_counts = Array.new(10, 0)
+	while a > 0
+		digit = a % 10
+		digit_counts[digit] += 1
+		a = (a - digit) / 10
 	end
-	num
+	while b > 0
+		digit = b % 10
+		digit_counts[digit] -= 1
+		b = (b - digit) / 10
+	end
+
+	digit_counts.all?{|c| c == 0}
 end
 
-def main	
-	#iterate over the cubes
-	n = 1
-	
-	checkedcubes = Set.new
-	
-	while true
-		puts n
-		
-		if checkedcubes.include? n
+
+def main
+    n = 1
+	# iterate over the number of digits
+	loop do
+		cubes = [n**3]
+		# get all the cubes of that many digits
+		while num_digits((n+1)**3) == num_digits(n**3)
+			cubes.push (n+1)**3
 			n += 1
-			next
 		end
-		
-		#get all the permutations of the digits
-		digits = []
-		k = n**3
-		while k > 0
-			digits.push(k%10)
-			k /= 10
-		end
-		digits.reverse!
-		
-		perms = []
-		permutations(perms, digits)
-		
-		permnums = Set.new
-		perms.each do |p|
-			permnums.add(getNumber(p))
-		end
-		cubecount = 0
-		#iterate over the permutations and count the number of cubes
-		permnums.each do |p|
-			possiblecube = Math.cbrt(p)
-			if possiblecube%1 == 0
-				checkedcubes.add(possiblecube.to_i)
-				cubecount += 1
+		# for each cube, compare it with all the cubes greater than it
+		# continue until there is a set of 5 cubes satisfying this property
+		(0...cubes.size).each do |i|
+			(i+1...cubes.size).each do |j|
+				next if !isPermutation? cubes[i], cubes[j]
+				(j+1...cubes.size).each do |k|
+					next if !isPermutation? cubes[j], cubes[k]
+					(k+1...cubes.size).each do |x|
+						next if !isPermutation? cubes[k], cubes[x]
+						(x+1...cubes.size).each do |y|
+							if isPermutation? cubes[x], cubes[y]
+								puts "Solution: " << cubes[i].to_s
+								return
+							end
+						end
+					end
+				end
 			end
-		end
-		
-		if cubecount >= 3
-			puts "Solution: " << (n**3).to_s
-			return
 		end
 		
 		n += 1
 	end
 end
 
-time1 = Time.now
+
 main
-time2 = Time.now
-puts "Time for program to run: " << (time2 - time1).to_s << " seconds"
