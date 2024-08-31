@@ -1,0 +1,3 @@
+(executable
+ (name Solution_65)
+ (libraries zarith))

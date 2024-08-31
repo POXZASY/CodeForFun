@@ -1,0 +1,17 @@
+# dune exec ./Solution_65.exe
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Shared cache location: /home/larkin/.cache/dune/db
+# Workspace root:
+# /mnt/c/Users/Larkin/Documents/Programming/CodeForFun/Project_Euler_Solutions
+# Auto-detected concurrency: 16
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dev
+#  ; merlin = true
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; instrument_with = []
+#  }
+$ /home/larkin/.opam/ocaml5.2/bin/ocamlc.opt -config > /tmp/dune_32b2d5_output
