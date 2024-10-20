@@ -1,3 +1,6 @@
 (executable
  (name Solution_65)
  (libraries zarith))
+
+(executable
+ (name Solution_66))
