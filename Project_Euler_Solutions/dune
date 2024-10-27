@@ -3,4 +3,6 @@
  (libraries zarith))
 
 (executable
- (name Solution_66))
+ (name Solution_66)
+ (libraries zarith)
+ (flags (:standard -warn-error "-unused-value-declaration")))
